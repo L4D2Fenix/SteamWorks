@@ -50,7 +50,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        python ../configure.py --sdks=l4d2 --hl2sdk-root=$GITHUB_WORKSPACE/assets --sm-path=$GITHUB_WORKSPACE/assets/sourcemod-central --mms-path=$GITHUB_WORKSPACE/assets/mmsource-central --steamworks-path=$GITHUB_WORKSPACE/assets/SteamworksSDK
+        python ../configure.py -s l4d2 --hl2sdk-root=$GITHUB_WORKSPACE/assets --sm-path=$GITHUB_WORKSPACE/assets/sourcemod-central --mms-path=$GITHUB_WORKSPACE/assets/mmsource-central --steamworks-path=$GITHUB_WORKSPACE/assets/SteamworksSDK
         ambuild
 
     - name: Run Configure and Build (Windows)
@@ -59,7 +59,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        python ..\configure.py --sdks=l4d2 --hl2sdk-root=%GITHUB_WORKSPACE%\assets --sm-path=%GITHUB_WORKSPACE%\assets\sourcemod-central --mms-path=%GITHUB_WORKSPACE%\assets\mmsource-central --steamworks-path=%GITHUB_WORKSPACE%\assets\SteamworksSDK
+        python ..\configure.py -s l4d2 --hl2sdk-root=%GITHUB_WORKSPACE%\assets --sm-path=%GITHUB_WORKSPACE%\assets\sourcemod-central --mms-path=%GITHUB_WORKSPACE%\assets\mmsource-central --steamworks-path=%GITHUB_WORKSPACE%\assets\SteamworksSDK
         ambuild
 
     - name: Upload Compiled Extension Artifacts
