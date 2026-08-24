@@ -39,17 +39,16 @@ jobs:
 
     - name: Clone Required SDK Dependencies
       run: |
-        mkdir -p assets
-        git clone --depth 1 https://github.com/rlabrecque/SteamworksSDK.git assets/SteamworksSDK
-        git clone --depth 1 -b l4d2 https://github.com/alliedmodders/hl2sdk.git assets/hl2sdk-l4d2
-        git clone --depth 1 -b 1.11-dev https://github.com/alliedmodders/metamod-source.git assets/mmsource-central
-        git clone --depth 1 -b 1.11-dev https://github.com/alliedmodders/sourcemod.git assets/sourcemod-central
+        git clone --depth 1 https://github.com/rlabrecque/SteamworksSDK.git SteamworksSDK
+        git clone --depth 1 -b l4d2 https://github.com/alliedmodders/hl2sdk.git hl2sdk-l4d2
+        git clone --depth 1 -b 1.11-dev https://github.com/alliedmodders/metamod-source.git mmsource-central
+        git clone --depth 1 -b 1.11-dev https://github.com/alliedmodders/sourcemod.git sourcemod-central
 
     - name: Run Configure and Build
       run: |
         mkdir build
         cd build
-        python ../configure.py --sdks=l4d2 --hl2sdk-root=../assets --sm-path=../assets/sourcemod-central --mms-path=../assets/mmsource-central --steamworks-path=../assets/SteamworksSDK
+        python ../configure.py --sdks=l4d2 --hl2sdk-root=../ --sm-path=../sourcemod-central --mms-path=../mmsource-central --steamworks-path=../SteamworksSDK
         ambuild
 
     - name: Upload Compiled Extension Artifacts
