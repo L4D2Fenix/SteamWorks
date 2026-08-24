@@ -43,15 +43,18 @@ jobs:
         git clone --depth 1 -b l4d2 https://github.com/alliedmodders/hl2sdk.git hl2sdk-l4d2
         git clone --depth 1 -b sdk2013 https://github.com/alliedmodders/hl2sdk.git hl2sdk-sdk2013
         git clone --depth 1 -b 1.10-dev https://github.com/alliedmodders/metamod-source.git mmsource-central
-        git clone --depth 1 -b 1.10-dev https://github.com/alliedmodders/sourcemod.git sourcemod-central
+        git clone --depth 1 --recurse-submodules -b 1.10-dev https://github.com/alliedmodders/sourcemod.git sourcemod-central
 
-    - name: Inject sp_vm_types.h directly
+    - name: Link SourcePawn Headers
       run: |
-        curl -sL https://raw.githubusercontent.com/alliedmodders/sourcemod/master/public/sourcepawn/sp_vm_types.h -o sourcemod-central/public/sourcepawn/sp_vm_types.h
-        curl -sL https://raw.githubusercontent.com/alliedmodders/sourcemod/master/public/sourcepawn/sp_vm_types.h -o sourcemod-central/public/sp_vm_types.h
+        mkdir -p sourcemod-central/public/sourcepawn
+        cp -r sourcemod-central/sourcepawn/include/* sourcemod-central/public/sourcepawn/ 2>/dev/null || true
+        cp -r sourcemod-central/sourcepawn/include/* sourcemod-central/public/ 2>/dev/null || true
 
     - name: Run Configure and Build (Linux)
       if: runner.os == 'Linux'
+      env:
+        CPPFLAGS: "-I${{ github.workspace }}/sourcemod-central/sourcepawn/include -I${{ github.workspace }}/sourcemod-central/public/sourcepawn"
       run: |
         mkdir build
         cd build
@@ -62,6 +65,7 @@ jobs:
       if: runner.os == 'Windows'
       shell: cmd
       run: |
+        set CPPFLAGS=-I%GITHUB_WORKSPACE%\sourcemod-central\sourcepawn\include -I%GITHUB_WORKSPACE%\sourcemod-central\public\sourcepawn
         mkdir build
         cd build
         python ..\configure.py --enable-optimize --sdks=all --hl2sdk-root=%GITHUB_WORKSPACE% --sm-path=%GITHUB_WORKSPACE%\sourcemod-central --mms-path=%GITHUB_WORKSPACE%\mmsource-central --steamworks-path=%GITHUB_WORKSPACE%\SteamworksSDK
