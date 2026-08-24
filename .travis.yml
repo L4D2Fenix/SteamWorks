@@ -1,67 +1,58 @@
-git:
-  depth: 1
+name: SteamWorks Custom 1.2.4 Build
 
-env:
- global:
-   - secure: "VsvGz6WqBVbT+RpnaWwYb16mVvQHQMvzfRxLlUEnYBVkKCWBgyECDXRL/ShBwGW+aMYW25ZPt/aJNk7rN/wvTrgGU2N9X6CrfVyGPp94HPSYPzEbZSXRoCGex30HkVVITYUBDd06CWuMMIOgS7At/XdJIR1ZjZpOr91Oze3YbGA="
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+  workflow_dispatch:
 
-matrix:
-  fast_finish: true
-  include:
-    - os: linux
-      dist: trusty
-      language: cpp
-      compiler: gcc
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test']
-          packages: ['lib32stdc++6', 'lib32z1-dev', 'libc6-dev-i386', 'linux-libc-dev', 'g++-multilib']
-      env:
-        - AMB="install --user"
-        - PATH="~/.local/bin:$PATH"
-        - RELEASE_PKG_FILE="package-lin.tgz"
-#    - os: windows
-#      language: cpp
-#      env:
-#        - AMB="install"
-#        - PATH="$PATH:/C/ProgramData/chocolatey/bin:/C/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/opt/bin"
-#        - RELEASE_PKG_FILE="package-win.tgz"
-    - os: mac
-      osx_image: xcode7.2
-      language: cpp
-      compiler: clang
-      env:
-        - AMB="install"
-        - PATH="~/.local/bin:$PATH"
-        - RELEASE_PKG_FILE="package-mac.tgz"
- 
-before_script:
- - mkdir assets && cd assets
- - git clone https://github.com/alliedmodders/ambuild.git
- - cd ambuild
- - python setup.py build
- - python setup.py $AMB
- - cd ..
- - git clone --depth 1 --recurse-submodules -j8 --shallow-submodules https://$OAUTH@github.com/SteamDatabase/SteamworksSDK.git SteamworksSDK
- - git clone --depth 1 --recurse-submodules -j8 --shallow-submodules -b sdk2013 https://github.com/alliedmodders/hl2sdk.git hl2sdk-sdk2013
- - git clone --depth 1 --recurse-submodules -j8 --shallow-submodules -b 1.10-dev https://github.com/alliedmodders/metamod-source.git mmsource-central
- - git clone --depth 1 --recurse-submodules -j8 --shallow-submodules -b 1.7-dev https://github.com/alliedmodders/sourcemod.git sourcemod-central
- - cd ..
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, windows-2019]
 
-script:
- - mkdir build
- - cd build
- - cp ../AMBuildScript ../../
- - python2 ../configure.py -s sdk2013 --hl2sdk-root ../assets --sm-path ../assets/sourcemod-central --mms-path ../assets/mmsource-central --steamworks-path ../assets/SteamworksSDK 
- - ambuild
- - tar czvf ${RELEASE_PKG_FILE} package
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
 
-deploy:
-  provider: releases
-  api_key:
-    secure: "Px60/dTgw3w6ZvxzyuilYaHHWFHWQ1rONhpbWJbxzz5+dfkmiqVyYLszlBrbS6tbyOv/oBMqcaOXsB7mv4OOlvKQPOjc8siS8ux1Ows8WL+yvRR/rGS0j28pP6HKN11hBerxOps3sqiCyNa2gNJ+3vX987SIekpIb5nqzuqg+yQ="
-  file_glob: true
-  file: "${RELEASE_PKG_FILE}"
-  skip_cleanup: true
-  on:
-    tags: true
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install Linux 32-bit Dependencies
+      if: runner.os == 'Linux'
+      run: |
+        sudo dpkg --add-architecture i386
+        sudo apt-get update
+        sudo apt-get install -y gcc-multilib g++-multilib lib32z1-dev libc6-dev-i386
+
+    - name: Install AMBuild
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install git+https://github.com/alliedmodders/ambuild.git
+
+    - name: Clone Required SDK Dependencies
+      run: |
+        git clone --depth 1 https://github.com/rlabrecque/SteamworksSDK.git SteamworksSDK
+        git clone --depth 1 -b l4d2 https://github.com/alliedmodders/hl2sdk.git hl2sdk-l4d2
+        git clone --depth 1 -b 1.11-dev https://github.com/alliedmodders/metamod-source.git mmsource
+        git clone --depth 1 -b 1.11-dev https://github.com/alliedmodders/sourcemod.git sourcemod
+
+    - name: Run Configure and Build
+      run: |
+        mkdir build
+        cd build
+        python ../configure.py -s l4d2 --hl2sdk-root ../ --sm-path ../sourcemod --mms-path ../mmsource --steamworks-path ../SteamworksSDK
+        ambuild
+
+    - name: Upload Compiled Extension Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: SteamWorks-1.2.4-Custom-${{ runner.os }}
+        path: build/package/
