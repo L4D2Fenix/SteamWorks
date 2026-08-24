@@ -43,19 +43,16 @@ jobs:
         git clone --depth 1 -b l4d2 https://github.com/alliedmodders/hl2sdk.git hl2sdk-l4d2
         git clone --depth 1 -b sdk2013 https://github.com/alliedmodders/hl2sdk.git hl2sdk-sdk2013
         git clone --depth 1 -b 1.10-dev https://github.com/alliedmodders/metamod-source.git mmsource-central
-        git clone --depth 1 -b 1.10-dev https://github.com/alliedmodders/sourcemod.git sourcemod-central
-        cd sourcemod-central
-        git submodule update --init --recursive
+        git clone --depth 1 --recurse-submodules -b 1.10-dev https://github.com/alliedmodders/sourcemod.git sourcemod-central
 
-    - name: Link AMTL & SourcePawn Headers
+    - name: Link AMTL and SourcePawn Headers
       run: |
         mkdir -p sourcemod-central/public/amtl
         mkdir -p sourcemod-central/public/sourcepawn
-        if [ -d "sourcemod-central/amtl" ]; then cp -r sourcemod-central/amtl/* sourcemod-central/public/amtl/ 2>/dev/null || true; fi
-        if [ -d "sourcemod-central/amtl/amtl" ]; then cp -r sourcemod-central/amtl/amtl/* sourcemod-central/public/amtl/ 2>/dev/null || true; fi
-        if [ -d "sourcemod-central/amtl/amtl" ]; then cp -r sourcemod-central/amtl/amtl/* sourcemod-central/public/ 2>/dev/null || true; fi
-        if [ -d "sourcemod-central/sourcepawn/include" ]; then cp -r sourcemod-central/sourcepawn/include/* sourcemod-central/public/sourcepawn/ 2>/dev/null || true; fi
-        if [ -d "sourcemod-central/sourcepawn/include" ]; then cp -r sourcemod-central/sourcepawn/include/* sourcemod-central/public/ 2>/dev/null || true; fi
+        find sourcemod-central -type f -name "am-string.h" -exec dirname {} \; | xargs -I {} cp -r {}/* sourcemod-central/public/amtl/
+        find sourcemod-central -type f -name "am-string.h" -exec dirname {} \; | xargs -I {} cp -r {}/* sourcemod-central/public/
+        find sourcemod-central -type f -name "sp_vm_types.h" -exec dirname {} \; | xargs -I {} cp -r {}/* sourcemod-central/public/sourcepawn/
+        find sourcemod-central -type f -name "sp_vm_types.h" -exec dirname {} \; | xargs -I {} cp -r {}/* sourcemod-central/public/
 
     - name: Run Configure and Build (Linux)
       if: runner.os == 'Linux'
