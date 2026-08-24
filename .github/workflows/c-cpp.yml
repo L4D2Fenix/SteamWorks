@@ -45,9 +45,11 @@ jobs:
         git clone --depth 1 -b 1.10-dev https://github.com/alliedmodders/metamod-source.git mmsource-central
         git clone --depth 1 -b 1.10-dev https://github.com/alliedmodders/sourcemod.git sourcemod-central
 
-    - name: Fix SourcePawn Include Paths
+    - name: Fix SourcePawn Header Location
       run: |
-        find sourcemod-central -name "sp_vm_types.h" -exec dirname {} \; | xargs -I {} cp -r {}/* sourcemod-central/public/
+        mkdir -p sourcemod-central/public/sourcepawn
+        cp -r sourcemod-central/sourcepawn/include/* sourcemod-central/public/sourcepawn/ 2>/dev/null || true
+        cp -r sourcemod-central/sourcepawn/include/* sourcemod-central/public/ 2>/dev/null || true
 
     - name: Run Configure and Build (Linux)
       if: runner.os == 'Linux'
