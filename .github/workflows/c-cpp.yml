@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, windows-2019]
+        os: [ubuntu-22.04, windows-2022]
 
     steps:
     - name: Checkout Code
@@ -45,7 +45,8 @@ jobs:
         git clone --depth 1 -b 1.11-dev https://github.com/alliedmodders/metamod-source.git mmsource-central
         git clone --depth 1 --recurse-submodules -b 1.11-dev https://github.com/alliedmodders/sourcemod.git sourcemod-central
 
-    - name: Fix SourcePawn and AMTL Include Locations
+    - name: Fix SourcePawn and AMTL Include Locations (Linux)
+      if: runner.os == 'Linux'
       run: |
         mkdir -p sourcemod-central/public/sourcepawn
         mkdir -p sourcemod-central/public/amtl
@@ -54,11 +55,26 @@ jobs:
         find sourcemod-central -name "am-string.h" -exec dirname {} \; | xargs -I {} cp -r {}/. sourcemod-central/public/amtl/ 2>/dev/null || true
         find sourcemod-central -name "am-string.h" -exec dirname {} \; | xargs -I {} cp -r {}/. sourcemod-central/public/ 2>/dev/null || true
 
+    - name: Fix SourcePawn and AMTL Include Locations (Windows)
+      if: runner.os == 'Windows'
+      shell: powershell
+      run: |
+        New-Item -ItemType Directory -Force -Path "sourcemod-central/public/sourcepawn"
+        New-Item -ItemType Directory -Force -Path "sourcemod-central/public/amtl"
+        Get-ChildItem -Path "sourcemod-central" -Recurse -Filter "sp_vm_types.h" | ForEach-Object { Copy-Item -Path "$($_.DirectoryName)\*" -Destination "sourcemod-central/public/sourcepawn" -Recurse -Force; Copy-Item -Path "$($_.DirectoryName)\*" -Destination "sourcemod-central/public" -Recurse -Force }
+        Get-ChildItem -Path "sourcemod-central" -Recurse -Filter "am-string.h" | ForEach-Object { Copy-Item -Path "$($_.DirectoryName)\*" -Destination "sourcemod-central/public/amtl" -Recurse -Force; Copy-Item -Path "$($_.DirectoryName)\*" -Destination "sourcemod-central/public" -Recurse -Force }
+
     - name: Patch Obsolete Steam API Calls & BuildScript
       run: |
-        sed -i 's/c++11/c++14/g' AMBuildScript
-        sed -i 's/-Werror//g' AMBuildScript
-        sed -i 's/pServer->ForceHeartbeat();/\/\/ pServer->ForceHeartbeat();/g' Extension/gsnatives.cpp
+        python -c "
+        with open('AMBuildScript', 'r') as f: content = f.read()
+        content = content.replace('c++11', 'c++14').replace('-Werror', '')
+        with open('AMBuildScript', 'w') as f: f.write(content)
+
+        with open('Extension/gsnatives.cpp', 'r') as f: content = f.read()
+        content = content.replace('pServer->ForceHeartbeat();', '// pServer->ForceHeartbeat();')
+        with open('Extension/gsnatives.cpp', 'w') as f: f.write(content)
+        "
 
     - name: Run Configure and Build (Linux)
       if: runner.os == 'Linux'
