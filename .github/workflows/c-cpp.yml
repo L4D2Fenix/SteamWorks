@@ -47,8 +47,7 @@ jobs:
 
     - name: Fix SourcePawn Include Paths
       run: |
-        cp -r sourcemod-central/public/sourcepawn/* sourcemod-central/public/
-        if [ -d "sourcemod-central/public/sourcepawn/include" ]; then cp -r sourcemod-central/public/sourcepawn/include/* sourcemod-central/public/; fi
+        find sourcemod-central -name "sp_vm_types.h" -exec dirname {} \; | xargs -I {} cp -r {}/* sourcemod-central/public/
 
     - name: Run Configure and Build (Linux)
       if: runner.os == 'Linux'
