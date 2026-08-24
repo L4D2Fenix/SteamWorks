@@ -1,9 +1,3 @@
-SteamWorks
-==========
-
-Exposing SteamWorks functions to SourcePawn.
-____________________________________________
-
 # SteamWorks
 
 Exposing SteamWorks functions to SourcePawn.
