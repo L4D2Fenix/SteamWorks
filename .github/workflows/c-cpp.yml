@@ -43,7 +43,12 @@ jobs:
         git clone --depth 1 -b l4d2 https://github.com/alliedmodders/hl2sdk.git hl2sdk-l4d2
         git clone --depth 1 -b sdk2013 https://github.com/alliedmodders/hl2sdk.git hl2sdk-sdk2013
         git clone --depth 1 -b 1.10-dev https://github.com/alliedmodders/metamod-source.git mmsource-central
-        git clone --depth 1 --recurse-submodules -b 1.10-dev https://github.com/alliedmodders/sourcemod.git sourcemod-central
+        git clone --depth 1 -b 1.10-dev https://github.com/alliedmodders/sourcemod.git sourcemod-central
+
+    - name: Inject sp_vm_types.h directly
+      run: |
+        curl -sL https://raw.githubusercontent.com/alliedmodders/sourcemod/master/public/sourcepawn/sp_vm_types.h -o sourcemod-central/public/sourcepawn/sp_vm_types.h
+        curl -sL https://raw.githubusercontent.com/alliedmodders/sourcemod/master/public/sourcepawn/sp_vm_types.h -o sourcemod-central/public/sp_vm_types.h
 
     - name: Run Configure and Build (Linux)
       if: runner.os == 'Linux'
