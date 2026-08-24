@@ -49,10 +49,10 @@ jobs:
       run: |
         mkdir -p sourcemod-central/public/sourcepawn
         mkdir -p sourcemod-central/public/amtl
-        find sourcemod-central -name "sp_vm_types.h" -exec dirname {} \; | xargs -I {} cp -r {}/* sourcemod-central/public/sourcepawn/
-        find sourcemod-central -name "sp_vm_types.h" -exec dirname {} \; | xargs -I {} cp -r {}/* sourcemod-central/public/
-        find sourcemod-central -name "am-string.h" -exec dirname {} \; | xargs -I {} cp -r {}/* sourcemod-central/public/amtl/
-        find sourcemod-central -name "am-string.h" -exec dirname {} \; | xargs -I {} cp -r {}/* sourcemod-central/public/
+        find sourcemod-central -name "sp_vm_types.h" -exec dirname {} \; | xargs -I {} cp -r {}/. sourcemod-central/public/sourcepawn/ 2>/dev/null || true
+        find sourcemod-central -name "sp_vm_types.h" -exec dirname {} \; | xargs -I {} cp -r {}/. sourcemod-central/public/ 2>/dev/null || true
+        find sourcemod-central -name "am-string.h" -exec dirname {} \; | xargs -I {} cp -r {}/. sourcemod-central/public/amtl/ 2>/dev/null || true
+        find sourcemod-central -name "am-string.h" -exec dirname {} \; | xargs -I {} cp -r {}/. sourcemod-central/public/ 2>/dev/null || true
 
     - name: Run Configure and Build (Linux)
       if: runner.os == 'Linux'
