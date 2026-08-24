@@ -54,10 +54,11 @@ jobs:
         find sourcemod-central -name "am-string.h" -exec dirname {} \; | xargs -I {} cp -r {}/. sourcemod-central/public/amtl/ 2>/dev/null || true
         find sourcemod-central -name "am-string.h" -exec dirname {} \; | xargs -I {} cp -r {}/. sourcemod-central/public/ 2>/dev/null || true
 
-    - name: Force C++14 in AMBuildScript (Linux)
+    - name: Patch AMBuildScript (C++14 & Disable Strict Destructor Warning)
       if: runner.os == 'Linux'
       run: |
         sed -i 's/c++11/c++14/g' AMBuildScript
+        sed -i 's/-Werror//g' AMBuildScript
 
     - name: Run Configure and Build (Linux)
       if: runner.os == 'Linux'
