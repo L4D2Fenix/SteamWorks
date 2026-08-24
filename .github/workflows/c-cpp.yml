@@ -42,13 +42,15 @@ jobs:
         git clone --depth 1 https://github.com/rlabrecque/SteamworksSDK.git SteamworksSDK
         git clone --depth 1 -b l4d2 https://github.com/alliedmodders/hl2sdk.git hl2sdk-l4d2
         git clone --depth 1 -b sdk2013 https://github.com/alliedmodders/hl2sdk.git hl2sdk-sdk2013
-        git clone --depth 1 -b 1.10-dev https://github.com/alliedmodders/metamod-source.git mmsource-central
-        git clone --depth 1 --recurse-submodules -b 1.10-dev https://github.com/alliedmodders/sourcemod.git sourcemod-central
+        git clone --depth 1 -b 1.11-dev https://github.com/alliedmodders/metamod-source.git mmsource-central
+        git clone --depth 1 --recurse-submodules -b 1.11-dev https://github.com/alliedmodders/sourcemod.git sourcemod-central
+
+    - name: Fix SourcePawn Include Subfolder
+      run: |
+        cp -r sourcemod-central/public/sourcepawn/include/* sourcemod-central/public/sourcepawn/ 2>/dev/null || true
 
     - name: Run Configure and Build (Linux)
       if: runner.os == 'Linux'
-      env:
-        CXXFLAGS: "-std=c++14"
       run: |
         mkdir build
         cd build
@@ -59,7 +61,6 @@ jobs:
       if: runner.os == 'Windows'
       shell: cmd
       run: |
-        set CXXFLAGS=/std:c++14
         mkdir build
         cd build
         python ..\configure.py --enable-optimize --sdks=all --hl2sdk-root=%GITHUB_WORKSPACE% --sm-path=%GITHUB_WORKSPACE%\sourcemod-central --mms-path=%GITHUB_WORKSPACE%\mmsource-central --steamworks-path=%GITHUB_WORKSPACE%\SteamworksSDK
