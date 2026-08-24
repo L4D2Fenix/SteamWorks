@@ -37,9 +37,12 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install git+https://github.com/alliedmodders/ambuild.git
 
-    - name: Clone Required SDK Dependencies
+    - name: Clone Compatible Dependencies (Steamworks SDK 1.42)
       run: |
-        git clone --depth 1 https://github.com/rlabrecque/SteamworksSDK.git SteamworksSDK
+        git clone https://github.com/rlabrecque/SteamworksSDK.git SteamworksSDK
+        cd SteamworksSDK
+        git checkout 1.42 2>/dev/null || git checkout 8d6d63ef2b89d873d9ca9d259275b9f1d04424ee 2>/dev/null || true
+        cd ..
         git clone --depth 1 -b l4d2 https://github.com/alliedmodders/hl2sdk.git hl2sdk-l4d2
         git clone --depth 1 -b sdk2013 https://github.com/alliedmodders/hl2sdk.git hl2sdk-sdk2013
         git clone --depth 1 -b 1.11-dev https://github.com/alliedmodders/metamod-source.git mmsource-central
@@ -64,16 +67,12 @@ jobs:
         Get-ChildItem -Path "sourcemod-central" -Recurse -Filter "sp_vm_types.h" | ForEach-Object { Copy-Item -Path "$($_.DirectoryName)\*" -Destination "sourcemod-central/public/sourcepawn" -Recurse -Force; Copy-Item -Path "$($_.DirectoryName)\*" -Destination "sourcemod-central/public" -Recurse -Force }
         Get-ChildItem -Path "sourcemod-central" -Recurse -Filter "am-string.h" | ForEach-Object { Copy-Item -Path "$($_.DirectoryName)\*" -Destination "sourcemod-central/public/amtl" -Recurse -Force; Copy-Item -Path "$($_.DirectoryName)\*" -Destination "sourcemod-central/public" -Recurse -Force }
 
-    - name: Patch Obsolete Steam API Calls & BuildScript
+    - name: Patch AMBuildScript
       run: |
         python -c "
         with open('AMBuildScript', 'r') as f: content = f.read()
         content = content.replace('c++11', 'c++14').replace('-Werror', '')
         with open('AMBuildScript', 'w') as f: f.write(content)
-
-        with open('Extension/gsnatives.cpp', 'r') as f: content = f.read()
-        content = content.replace('pServer->ForceHeartbeat();', '// pServer->ForceHeartbeat();')
-        with open('Extension/gsnatives.cpp', 'w') as f: f.write(content)
         "
 
     - name: Run Configure and Build (Linux)
