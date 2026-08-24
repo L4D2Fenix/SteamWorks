@@ -41,6 +41,7 @@ jobs:
       run: |
         git clone --depth 1 https://github.com/rlabrecque/SteamworksSDK.git SteamworksSDK
         git clone --depth 1 -b l4d2 https://github.com/alliedmodders/hl2sdk.git hl2sdk-l4d2
+        git clone --depth 1 -b sdk2013 https://github.com/alliedmodders/hl2sdk.git hl2sdk-sdk2013
         git clone --depth 1 -b 1.11-dev https://github.com/alliedmodders/metamod-source.git mmsource-central
         git clone --depth 1 --recurse-submodules -b 1.11-dev https://github.com/alliedmodders/sourcemod.git sourcemod-central
 
@@ -80,7 +81,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        python ../configure.py --enable-optimize --sdks=l4d2 --hl2sdk-root=$GITHUB_WORKSPACE --sm-path=$GITHUB_WORKSPACE/sourcemod-central --mms-path=$GITHUB_WORKSPACE/mmsource-central --steamworks-path=$GITHUB_WORKSPACE/SteamworksSDK
+        python ../configure.py --enable-optimize --sdks=all --hl2sdk-root=$GITHUB_WORKSPACE --sm-path=$GITHUB_WORKSPACE/sourcemod-central --mms-path=$GITHUB_WORKSPACE/mmsource-central --steamworks-path=$GITHUB_WORKSPACE/SteamworksSDK
         ambuild
 
     - name: Run Configure and Build (Windows)
@@ -89,7 +90,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        python ..\configure.py --enable-optimize --sdks=l4d2 --hl2sdk-root=%GITHUB_WORKSPACE% --sm-path=%GITHUB_WORKSPACE%\sourcemod-central --mms-path=%GITHUB_WORKSPACE%\mmsource-central --steamworks-path=%GITHUB_WORKSPACE%\SteamworksSDK
+        python ..\configure.py --enable-optimize --sdks=all --hl2sdk-root=%GITHUB_WORKSPACE% --sm-path=%GITHUB_WORKSPACE%\sourcemod-central --mms-path=%GITHUB_WORKSPACE%\mmsource-central --steamworks-path=%GITHUB_WORKSPACE%\SteamworksSDK
         ambuild
 
     - name: Upload Compiled Extension Artifacts
