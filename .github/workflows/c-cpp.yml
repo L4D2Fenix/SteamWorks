@@ -52,6 +52,8 @@ jobs:
         mkdir -p sourcemod-central/public/sourcepawn
         cp -r sourcemod-central/sourcepawn/include/* sourcemod-central/public/sourcepawn/
         cp -r sourcemod-central/sourcepawn/include/* sourcemod-central/public/
+        cp -r sourcemod-central/public/amtl/amtl/* sourcemod-central/public/amtl/
+        cp -r sourcemod-central/public/amtl/amtl/* sourcemod-central/public/
 
     - name: Run Configure and Build (Linux)
       if: runner.os == 'Linux'
