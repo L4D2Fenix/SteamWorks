@@ -39,9 +39,7 @@ jobs:
 
     - name: Clone Required SDK Dependencies
       run: |
-        git clone https://github.com/rlabrecque/SteamworksSDK.git SteamworksSDK
-        cd SteamworksSDK && git checkout 4d41594#diff-cfb093ce0838f6b6a98c27d3fa7ec8b56400a5e0c832732768c741425124c24d 2>/dev/null || git checkout master
-        cd ..
+        git clone --depth 1 https://github.com/rlabrecque/SteamworksSDK.git SteamworksSDK
         git clone --depth 1 -b l4d2 https://github.com/alliedmodders/hl2sdk.git hl2sdk-l4d2
         git clone --depth 1 -b 1.11-dev https://github.com/alliedmodders/metamod-source.git mmsource-central
         git clone --depth 1 --recurse-submodules -b 1.11-dev https://github.com/alliedmodders/sourcemod.git sourcemod-central
